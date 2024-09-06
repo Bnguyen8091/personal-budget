@@ -1,71 +1,90 @@
+/* General Reset */
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+/* Body Styling */
 body {
-    font-size: 10px;
-    font-family: Tahoma, Arial;
+    font-size: 16px; /* Increased font size for readability */
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif; /* Updated for a cleaner modern font */
+    line-height: 1.6; /* Improved line-height for readability */
+    background-color: #f4f6fc; /* Light background color for a cleaner look */
+    color: #333; /* Darker text color for contrast */
 }
 
+/* Navigation */
 nav {
     width: 100%;
-    background-color: #4d5791;
-    height: 44px;
+    background-color: #4d5791; /* Dark purple for contrast */
+    height: 60px; /* Slightly increased height for spacious feel */
     padding: 0 40px;
+    display: flex; /* Flexbox for easy alignment */
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
 }
 
-nav ul,
-nav ul li {
-    margin: 0;
-    padding: 0 ;
+nav ul {
     list-style: none;
-    display: inline-block;
+    display: flex; /* Changed to flex for better alignment */
+    margin: 0;
+}
+
+nav ul li {
+    margin-right: 20px;
 }
 
 nav ul li a {
     display: block;
-    padding: 0 20px;
-    line-height: 44px;
+    padding: 10px 20px;
     font-size: 1.4em;
     text-decoration: none;
     color: #fff;
-    margin: 0;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for hover */
 }
 
-nav ul li a:hover  {
+nav ul li a:hover {
     background-color: white;
     color: #4d5791;
 }
 
-div.hero {
+/* Hero Section */
+.hero {
     height: 350px;
-    background-color: #b4c6f0;
+    background-color: #b4c6f0; /* Light blue background */
     background-image: url('bg.png');
-    background-size: 400px;
+    background-size: cover; /* Ensure full coverage of background image */
     background-repeat: no-repeat;
     background-position: center bottom;
-    padding-top: 40px;
-}
-
-div.hero h1,
-div.hero h2 {
-    text-align: center;
-    margin: 0;
-}
-
-div.hero h1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     color: #fff;
-    font-size: 4.2em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Text shadow for readability */
+}
+
+.hero h1 {
+    font-size: 4.5em;
     margin-bottom: 20px;
+    font-weight: 700; /* Bolder title */
 }
 
-div.hero h2 {
-    color: #4d5791;
+.hero h2 {
+    font-size: 2em;
+    color: #fff;
+    font-weight: 300;
 }
 
+/* Main Content */
 main {
-    padding: 40px;
+    padding: 60px 20px;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto; /* Center the main content */
 }
 
 .page-area {
@@ -73,37 +92,80 @@ main {
     display: inline-block;
 }
 
-footer {
-    height: 50px;
-    background-color: #b4c6f0;
-    padding: 40px;
-}
-
-.skip {
-    display: block;
-    line-height: 44px;
-    padding: 0 20px;
-    margin-top: -44px;
-}
-
-.skip:focus {
-    margin-top: 0;
-}
-
-.center {
-    text-align: center;
-}
-
+/* Article Styling */
 main article {
     display: inline-block;
     width: 100%;
     max-width: 340px;
     text-align: justify;
     margin: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Added shadow for card effect */
+    transition: transform 0.3s ease; /* Add subtle scaling effect on hover */
 }
 
+main article:hover {
+    transform: translateY(-5px); /* Lift card on hover */
+}
+
+main article h1 {
+    font-size: 1.8em;
+    color: #4d5791;
+    margin-bottom: 15px;
+}
+
+main article p {
+    color: #555;
+}
+
+/* Footer Styling */
+footer {
+    height: auto;
+    background-color: #4d5791; /* Matches navigation */
+    padding: 40px;
+    text-align: center;
+    color: #fff;
+    font-size: 1em;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Skip Link (Accessibility Improvement) */
+.skip {
+    display: block;
+    line-height: 44px;
+    padding: 0 20px;
+    margin-top: -44px;
+    color: #fff;
+    background-color: #4d5791;
+    text-align: center;
+}
+
+.skip:focus {
+    margin-top: 0;
+    outline: 2px solid #fff; /* Visible outline for keyboard focus */
+    background-color: #333;
+}
+
+/* Utility Classes */
+.center {
+    text-align: center;
+}
+
+/* Responsive Design */
 @media screen and (min-width: 768px) {
     main article {
-        margin: 10px;
+        margin: 20px 10px;
+    }
+
+    .hero h1 {
+        font-size: 5em; /* Larger font size for bigger screens */
     }
 }

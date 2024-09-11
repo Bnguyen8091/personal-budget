@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Budget</title>
+    <!-- This is an SEO Change -->
+    <meta name="description" content="A free personal budget app to help you manage your finances efficiently.">
+    <!-- This is an SEO Change -->
+    <meta name="keywords" content="personal budget, financial management, free app">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="main.css">
+    <!-- Add D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        #d3Chart {
+            width: 100%; /* Ensure the SVG fits the container */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: 5px;
+            font-size: 12px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .slice:hover {
+            cursor: pointer;
+            transform: scale(1.1); /* Slightly increase the size on hover */
+        }
+
+        .line {
+            stroke: #000;
+            stroke-width: 2px;
+            fill: none;
+        }
+
+        .label {
+            font-size: 12px;
+            fill: #000;
+        }
+    </style>
+</head>
+<body>
+
+<!-- This is an A11y Change -->
+<a href="#main" class="skip">Skip to content</a>
+
+<!-- This is a Semantic HTML Change -->
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/login.html">Login</a></li>
+            <li><a href="https://google.com">Google</a></li>
+        </ul>
+    </nav>
+</header>
+
+<div class="hero">
+    <h1>Personal Budget</h1>
+    <h2>A personal-budget management app</h2>
+</div>
+
+<!-- This is a Semantic HTML Change -->
+<main class="center" id="main">
+
+    <!-- This is a Semantic HTML Change -->
+    <section class="page-area">
+        <article>
+            <h2>Stay on track</h2> 
+            <p>
+                Do you know where you are spending your money? If you really stop to track it down,
+                you would get surprised! Proper budget management depends on real data... and this
+                app will help you with that!
+            </p>
+        </article>
+
+        <article>
+            <h2>Alerts</h2> 
+            <p>
+                What if your clothing budget ended? You will get an alert. The goal is to never go over the budget.
+            </p>
+        </article>
+
+        <article>
+            <h2>Results</h2> 
+            <p>
+                People who stick to a financial plan, budgeting every expense, get out of debt faster!
+                Also, they live happier lives... since they spend without guilt or fear... 
+                because they know it is all good and accounted for.
+            </p>
+        </article>
+
+        <article>
+            <h2>Free</h2>
+            <p>
+                This app is free! And you are the only one holding your data!
+            </p>
+        </article>
+
+        <article>
+            <h2>Chart</h2>
+            <p>
+                <!-- This is an A11y Change -->
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </p>
+        </article>
+
+        <!-- New D3.js Chart Section -->
+        <article>
+            <h2>D3JS Chart</h2>
+            <p>
+                <svg id="d3Chart" viewBox="0 0 400 400"></svg>
+            </p>
+        </article>
+
+    </section>
+
+</main>
+
+<!-- This is a Semantic HTML Change -->
+<footer class="bottom">
+    <div class="center">
+        All rights reserved &copy; Brian Nguyen
+    </div>
+</footer>
+
+<!-- This is an A11y Change -->
+<a href="#main" class="skip">Skip to content</a> 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.min.js" integrity="sha512-quHCp3WbBNkwLfYUMd+KwBAgpVukJu5MncuQaWXgCrfgcxCJAq/fo+oqrRKOj+UKEmyMCG3tb8RB63W+EmrOBg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js" integrity="sha512-s+xg36jbIujB2S2VKfpGmlC3T5V2TF3lY48DX7u2r9XzGzgPsa6wTpOQA7J9iffvdeBN0q9tKzRxVxw1JviZPg==" crossorigin="anonymous"></script>
+
+<script>
+    var dataSource = {
+        datasets: [
+            {
+                data: [],
+                backgroundColor: [
+                    '#ffcd56', // Yellow for Eat Out
+                    '#ff6384', // Pink for Rent
+                    '#36a2eb', // Blue for Grocery
+                    '#fd6b19', // Orange for Utilities
+                    '#8d6e63', // Brown for Entertainment
+                    '#4db6ac', // Teal for Transportation
+                    '#9575cd', // Purple for Savings
+                ],
+            }
+        ],
+        labels: []
+    };
+
+    function createChart() {
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: dataSource
+        });
+    }
+
+    function getBudget() {
+        axios.get('http://localhost:3000/budget')
+        .then(function (res) {
+            for (var i = 0; i < res.data.myBudget.length; i++) {
+                dataSource.datasets[0].data[i] = res.data.myBudget[i].budget;
+                dataSource.labels[i] = res.data.myBudget[i].title;
+            }
+            createChart();
+            createD3Chart(res.data.myBudget); 
+        });
+    }
+
+    getBudget();
+
+    function createD3Chart(budgetData) {
+        var svg = d3.select("#d3Chart"),
+            width = 400,
+            height = 400,
+            radius = Math.min(width, height) / 2 - 10,
+            g = svg
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var color = d3.scaleOrdinal()
+            .domain(budgetData.map(function(d) { return d.title; }))
+            .range(['#ffcd56', '#ff6384', '#36a2eb', '#fd6b19', '#8d6e63', '#4db6ac', '#9575cd']);
+
+        var pie = d3.pie().value(function(d) { return d.budget; });
+
+        var arc = d3.arc()
+            .outerRadius(radius * 0.9) // Increased outer radius
+            .innerRadius(radius * 0.4); // Added inner radius to create a doughnut effect
+
+        var outerArc = d3.arc()
+            .innerRadius(radius * 0.9)
+            .outerRadius(radius * 0.9);
+
+        // Remove any existing arcs to avoid duplication
+        g.selectAll(".arc").remove();
+
+        var slice = g.selectAll(".arc")
+            .data(pie(budgetData))
+            .enter().append("g")
+            .attr("class", "arc");
+
+        slice.append("path")
+            .attr("d", arc)
+            .attr("fill", function(d) { return color(d.data.title); })
+            .style("stroke", "#fff") // Added stroke color
+            .style("stroke-width", "2px") // Increased stroke width for better visibility
+            .attr("class", "slice"); // Added class for hover effect
+
+        // Create lines and labels
+        var lineGroup = svg.append("g");
+        var labelGroup = svg.append("g");
+
+        slice.each(function(d) {
+            var centroid = arc.centroid(d);
+            var pos = outerArc.centroid(d);
+            pos[0] = radius * (d.endAngle + d.startAngle < Math.PI ? 1.5 : -1.5); // Adjust position for label
+            
+            lineGroup.append("line")
+                .attr("x1", centroid[0])
+                .attr("y1", centroid[1])
+                .attr("x2", pos[0])
+                .attr("y2", pos[1])
+                .attr("class", "line");
+
+            labelGroup.append("text")
+                .attr("x", pos[0])
+                .attr("y", pos[1])
+                .attr("dy", ".35em")
+                .text(d.data.title)
+                .attr("class", "label")
+                .attr("text-anchor", "middle");
+        });
+
+        // Tooltips
+        var tooltip = d3.select("body").append("div").attr("class", "tooltip");
+
+        slice.on("mouseover", function(event, d) {
+            d3.select(this).select("path").transition().duration(300).attr("d", d3.arc().outerRadius(radius * 1.05).innerRadius(radius * 0.4));
+            tooltip.transition().duration(200).style("opacity", .9);
+            tooltip.html(d.data.title)
+                .style("left", (event.pageX + 5) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        }).on("mouseout", function(d) {
+            d3.select(this).select("path").transition().duration(300).attr("d", arc);
+            tooltip.transition().duration(500).style("opacity", 0);
+        });
+    }
+</script>
+
+</body>
+</html>

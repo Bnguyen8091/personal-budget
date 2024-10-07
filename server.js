@@ -1,12 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-require('dotenv').config(); // To use environment variables from .env
+const cors = require('cors');
+
 const app = express();
 const port = 3000;
 
-// Middleware to parse JSON request bodies
+// Middleware to parse JSON request bodies and enable CORS
 app.use(express.json());
+app.use(cors());
 
 // Serve static files from the public folder
 app.use('/', express.static('public'));
@@ -33,7 +35,7 @@ const Budget = mongoose.model('Budget', budgetSchema);
 app.get('/budget', async (req, res) => {
     try {
         const budgets = await Budget.find(); // Fetch all budget items from MongoDB
-        res.json({ myBudget: budgets });
+        res.json({ myBudget: budgets }); // Send the fetched budget items as a response
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -55,11 +57,6 @@ app.post('/budget', async (req, res) => {
     } catch (err) {
         res.status(400).json({ message: err.message }); // Handle validation or saving errors
     }
-});
-
-// Test hello world route
-app.get('/hello', (req, res) => {
-    res.send('Hello World!');
 });
 
 // Start the server

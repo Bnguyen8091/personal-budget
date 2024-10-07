@@ -1,50 +1,68 @@
+require('dotenv').config();
 const express = require('express');
+const mongoose = require('mongoose');
+require('dotenv').config(); // To use environment variables from .env
 const app = express();
 const port = 3000;
 
+// Middleware to parse JSON request bodies
+app.use(express.json());
+
+// Serve static files from the public folder
 app.use('/', express.static('public'));
 
-const budget = {
-    myBudget: [
-        {
-            title: 'Eat out',
-            budget: 25
-        },
-        {
-            title: 'Rent',
-            budget: 375
-        },
-        {
-            title: 'Grocery',
-            budget: 110
-        },
-        {
-            title: 'Utilities',
-            budget: 100
-        },
-        {
-            title: 'Entertainment',
-            budget: 50
-        },
-        {
-            title: 'Transportation',
-            budget: 60
-        },
-        {
-            title: 'Savings',
-            budget: 200
-        }
-    ]
-};
+// Connect to MongoDB using Mongoose
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('Could not connect to MongoDB', err));
 
-app.get('/hello', (rqe, res) => {
+// Mongoose schema and model for the budget
+const budgetSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    budget: { type: Number, required: true },
+    color: {
+        type: String,
+        required: true,
+        match: /^#[0-9A-F]{6}$/i  // Validates color as a hexadecimal string
+    }
+});
+
+const Budget = mongoose.model('Budget', budgetSchema);
+
+// GET endpoint to fetch all budget items from MongoDB
+app.get('/budget', async (req, res) => {
+    try {
+        const budgets = await Budget.find(); // Fetch all budget items from MongoDB
+        res.json({ myBudget: budgets });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// POST endpoint to add new budget items to MongoDB
+app.post('/budget', async (req, res) => {
+    const { title, budget, color } = req.body; // Extract title, budget, and color from the request body
+
+    const newBudget = new Budget({
+        title,
+        budget,
+        color
+    });
+
+    try {
+        const savedBudget = await newBudget.save(); // Save the new budget item to MongoDB
+        res.status(201).json(savedBudget); // Respond with the saved budget item
+    } catch (err) {
+        res.status(400).json({ message: err.message }); // Handle validation or saving errors
+    }
+});
+
+// Test hello world route
+app.get('/hello', (req, res) => {
     res.send('Hello World!');
 });
 
-app.get('/budget', (req, res) => {
-    res.json(budget);
-});
-
+// Start the server
 app.listen(port, () => {
     console.log(`API served at http://localhost:${port}`);
 });
